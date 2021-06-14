@@ -25,8 +25,17 @@
       function flattenObject(array) {
         // will map over array
         const location = array[0];
+        const data = [];
         const flattenedLocations = extractObjectKeys(location);
-        console.log(flattenedLocations);
+        for (const { city, country, state, ...rest } of array) {
+          data.push({
+            ...rest,
+            country,
+            state,
+            city,
+          });
+        }
+        return { headers: flattenedLocations, data };
       }
 
       function extractObjectKeys(object) {
@@ -63,7 +72,7 @@
       function App() {
         const [people, setPeople] = useState([]);
 
-        const [headers, setHeaders] = useState([]);
+        const [headers, setHeaders] = useState({ headers: [], data: [] });
         useEffect(() => {
           fetchPeople().then((apiPeople) => {
             const { results } = apiPeople;
@@ -71,10 +80,18 @@
             setHeaders(flattenObject(results.map(({ location }) => location)));
           });
         }, []);
-
+        console.log(headers);
+        const { headers: flattenedHeader } = headers;
         return (
-          <div>
+          <div className="container">
             <h1>Table creation w/ API request</h1>
+            <table className="table-data">
+              <tr>
+                {flattenedHeader.map((h, i) => (
+                  <th key={i}>{h}</th>
+                ))}
+              </tr>
+            </table>
           </div>
         );
       }
