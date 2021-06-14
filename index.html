@@ -22,6 +22,28 @@
     <script type="text/babel">
       const rootElement = document.getElementById('root');
 
+      function flattenObject(array) {
+        // will map over array
+        const location = array[0];
+        const flattenedLocations = extractObjectKeys(location);
+        console.log(flattenedLocations);
+      }
+
+      function extractObjectKeys(object) {
+        let objectKeys = [];
+        const keys = Object.keys(object);
+        keys.forEach((key) => {
+          if (typeof object[key] !== 'object') {
+            objectKeys.push(key);
+          } else {
+            // the bug we had here was trying to spread the actual key (string)
+            // instead of the existing objectKeys array
+            objectKeys = [...objectKeys, ...extractObjectKeys(object[key])];
+          }
+        });
+        return objectKeys;
+      }
+
       function fetchPeople() {
         return window
           .fetch(API_URL)
@@ -41,14 +63,15 @@
       function App() {
         const [people, setPeople] = useState([]);
 
-        const [headers, setHeaders] = useState({ headers: [], data: [] });
+        const [headers, setHeaders] = useState([]);
         useEffect(() => {
           fetchPeople().then((apiPeople) => {
             const { results } = apiPeople;
             setPeople(results);
+            setHeaders(flattenObject(results.map(({ location }) => location)));
           });
         }, []);
-        console.log(people);
+
         return (
           <div>
             <h1>Table creation w/ API request</h1>
