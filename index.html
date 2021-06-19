@@ -42,10 +42,10 @@
             country,
             state,
             city,
-            streetName: street.name,
-            streetNumber: street.number,
-            lat: coordinates.latitude,
-            lon: coordinates.longitude,
+            number: street.number,
+            name: street.name,
+            latitude: coordinates.latitude,
+            longitude: coordinates.longitude,
             offset: timezone.offset,
             description: timezone.description,
           });
@@ -100,24 +100,25 @@
         return (
           <div className="container">
             <h1>Table creation w/ API request</h1>
+            <div>
+              <input
+                type="text"
+                name="search"
+                id="search"
+                placeholder="filter data"
+              />
+            </div>
             <table className="table-data">
               <tr>
                 {flattenedHeader.map((h, i) => (
                   <th key={i}>{h}</th>
                 ))}
               </tr>
-              {data.map((obj) => (
-                <tr>
-                  <td>{obj.streetNumber}</td>
-                  <td>{obj.streetName}</td>
-                  <td>{obj.city}</td>
-                  <td>{obj.state}</td>
-                  <td>{obj.country}</td>
-                  <td>{obj.postcode}</td>
-                  <td>{obj.lat}</td>
-                  <td>{obj.lon}</td>
-                  <td>{obj.offset}</td>
-                  <td>{obj.description}</td>
+              {data.map((location, index) => (
+                <tr key={index}>
+                  {flattenedHeader.map((header, headerIndex) => (
+                    <td key={headerIndex}>{location[header]}</td>
+                  ))}
                 </tr>
               ))}
             </table>
