@@ -82,13 +82,40 @@
           });
       }
 
+      /*
+      for comparing number values for sorting purposes
+      */
+
       const { render } = ReactDOM;
       const { useState, useEffect } = React;
       const API_URL = 'https://randomuser.me/api/?results=20';
       function App() {
         const [people, setPeople] = useState([]);
-
+        const [ascending, setAscending] = useState(true);
         const [headers, setHeaders] = useState({ headers: [], data: [] });
+
+        const compareNumbers = (a, b) => {
+          if (a > b) return ascending ? 1 : -1;
+          if (a < b) return ascending ? -1 : 1;
+          return 0;
+        };
+        // onclick handler for sorting columns
+
+        const sortColumns = (columnKey) => {
+          const { data } = headers;
+          /* use previous state as reference for how to render new state */
+          setAscending(!ascending);
+          setHeaders((previousState) => {
+            return {
+              ...previousState,
+
+              data: previousState.data.sort((a, b) =>
+                compareNumbers(a[columnKey], b[columnKey])
+              ),
+            };
+          });
+        };
+
         useEffect(() => {
           fetchPeople().then((apiPeople) => {
             const { results } = apiPeople;
@@ -111,7 +138,9 @@
             <table className="table-data">
               <tr>
                 {flattenedHeader.map((h, i) => (
-                  <th key={i}>{h}</th>
+                  <th key={i} onClick={() => sortColumns(h)}>
+                    {h}
+                  </th>
                 ))}
               </tr>
               {data.map((location, index) => (
